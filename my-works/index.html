@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Тренажер для мозку</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css?v=7.0">
+    <link rel="stylesheet" href="adaptive-styles.css?v=1.0">
+</head>
+<body>
+    <div id="app">
+        <header>
+            <div class="header-icon">🧠</div>
+            <h1>Тренажер для мозку</h1>
+            <p class="subtitle">Логіка та IQ</p>
+        </header>
+
+        <nav class="tabs">
+            <button class="tab-btn active" onclick="switchTab('quiz')">🎯 Квіз</button>
+            <button class="tab-btn" onclick="switchTab('diary')">📝 Цілі</button>
+            <button class="tab-btn" onclick="switchTab('quotes')">🔮 Цитати</button>
+            <button class="tab-btn" onclick="switchTab('game')">🕹️ Гра</button>
+        </nav>
+
+        <main>
+            <!-- КВІЗ -->
+            <div id="quiz-tab" class="tab-content active">
+                <div id="start-screen" class="screen active">
+                    <div class="start-icon">🎯</div>
+                    <h2>Готовий перевірити свою логіку?</h2>
+                    <p class="start-desc">Цікаві питання на логіку та уважність</p>
+                    <div class="stats-preview">
+                        <div class="stat-item">
+                            <span class="stat-number" id="total-questions">5</span>
+                            <span class="stat-label">Питань</span>
+                        </div>
+                    </div>
+                    <button class="btn-primary" id="start-btn">Почати тест</button>
+                </div>
+
+                <div id="question-screen" class="screen">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill"></div>
+                    </div>
+                    <div class="question-header">
+                        <span id="question-number">Питання 1 з 5</span>
+                        <span class="question-category" id="question-category">Логіка</span>
+                    </div>
+                    <div class="question-text" id="question-text"></div>
+                    <div class="answers" id="answers"></div>
+                    <button class="btn-next" id="next-btn">Наступне питання →</button>
+                </div>
+
+                <div id="result-screen" class="screen">
+                    <div class="result-icon" id="result-icon">🎉</div>
+                    <h2 id="result-title">Чудово!</h2>
+                    <div class="result-score" id="result-score">4 з 5</div>
+                    <p class="result-message" id="result-message"></p>
+                    <button class="btn-primary" id="restart-btn">Почати знову</button>
+                </div>
+            </div>
+
+            <!-- ЦІЛІ -->
+            <div id="diary-tab" class="tab-content">
+                <div class="sticker-form">
+                    <h3>➕ Додати нову ціль</h3>
+                    <div class="form-row">
+                        <input type="text" id="sticker-input" placeholder="Наприклад: Прочитати книгу" maxlength="100">
+                        <select id="sticker-color">
+                            <option value="#7b2fff">💜 Фіолетовий</option>
+                            <option value="#00f5ff">💙 Блакитний</option>
+                            <option value="#00ff88">💚 Зелений</option>
+                            <option value="#ff6b6b">❤️ Червоний</option>
+                            <option value="#ffaa00">🧡 Помаранчевий</option>
+                            <option value="#ff00ff">💗 Рожевий</option>
+                            <option value="#ffff00">💛 Жовтий</option>
+                        </select>
+                        <button id="add-sticker-btn" class="btn-add-sticker">Додати</button>
+                    </div>
+                </div>
+                <div class="stickers-board" id="stickers-board"></div>
+                <div class="empty-board" id="empty-board">
+                    <div class="empty-icon">📋</div>
+                    <p>Ще немає цілей</p>
+                    <p class="empty-sub">Додай свою першу мету вгорі!</p>
+                </div>
+            </div>
+
+            <!-- ЦИТАТИ -->
+            <div id="quotes-tab" class="tab-content">
+                <div class="quotes-container">
+                    <div class="quotes-icon">🔮</div>
+                    <div id="quotes-loading" class="quotes-loading">
+                        <div class="loading-spinner"></div>
+                        <p>Завантажую мудрість з інтернету...</p>
+                    </div>
+                    <div id="quotes-card" class="quotes-card hidden">
+                        <div class="quote-label">📜 Цитата дня</div>
+                        <div class="quote-text" id="quote-text"></div>
+                        <div class="quote-author" id="quote-author"></div>
+                        <div class="quote-buttons">
+                            <button id="new-quote-btn" class="btn-quote">🔮 Нова цитата</button>
+                        </div>
+                    </div>
+                    <div id="quotes-error" class="quotes-error hidden">
+                        <div class="error-icon">😵</div>
+                        <p>Ой, щось пішло не так...</p>
+                        <button id="retry-btn" class="btn-quote">🔄 Спробувати знову</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ГРА -->
+            <div id="game-tab" class="tab-content">
+                <div class="game-container">
+                    <div class="game-header">
+                        <div class="game-score">
+                            <span class="game-score-label">Рахунок:</span>
+                            <span class="game-score-value" id="game-score">0</span>
+                        </div>
+                        <div class="game-lives">
+                            <span id="game-lives">❤️❤️❤️</span>
+                        </div>
+                    </div>
+                    
+                    <div class="canvas-wrapper" id="canvas-wrapper">
+                        <canvas id="gameCanvas" width="400" height="500"></canvas>
+                        
+                        <!-- Стартовий екран -->
+                        <div class="game-overlay" id="game-start-overlay">
+                            <div class="overlay-content">
+                                <div class="overlay-icon">🧠</div>
+                                <h3>Імпульс мізків</h3>
+                                <p>Уникай перешкод!</p>
+                                <button class="btn-primary" id="game-start-btn">СТАРТ</button>
+                            </div>
+                        </div>
+
+                        <!-- Game Over -->
+                        <div class="game-overlay hidden" id="game-over-overlay">
+                            <div class="overlay-content">
+                                <div class="overlay-icon">💀</div>
+                                <h3>Гра закінчена!</h3>
+                                <p>Рахунок: <span id="final-score">0</span></p>
+                                <button class="btn-primary" id="game-restart-btn">ЗНОВУ</button>
+                            </div>
+                        </div>
+
+                        <!-- Win -->
+                        <div class="game-overlay hidden" id="game-win-overlay">
+                            <div class="overlay-content">
+                                <div class="overlay-icon">🏆</div>
+                                <h3>Перемога!</h3>
+                                <button class="btn-primary" id="game-win-restart-btn">ЗНОВУ</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Кнопка стрибка для мобільних -->
+                    <button class="btn-jump" id="btn-jump">СТРИБОК</button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Підключення JS модулів (порядок важливий!) -->
+    <script src="quiz.js?v=7.0"></script>
+    <script src="goals.js?v=7.0"></script>
+    <script src="quotes.js?v=7.0"></script>
+    <script src="game.js?v=7.0"></script>
+    <script src="main.js?v=7.0"></script>
+</head>
+<body>
+    <div id="app">
+        <header>
+            <div class="header-icon">🧠</div>
+            <h1>Тренажер для мозку</h1>
+            <p class="subtitle">Логіка та IQ</p>
+        </header>
+
+        <nav class="tabs">
+            <button class="tab-btn active" onclick="switchTab('quiz')">🎯 Квіз</button>
+            <button class="tab-btn" onclick="switchTab('diary')">📝 Цілі</button>
+            <button class="tab-btn" onclick="switchTab('quotes')">🔮 Цитати</button>
+            <button class="tab-btn" onclick="switchTab('game')">🕹️ Гра</button>
+        </nav>
+
+        <main>
+            <!-- КВІЗ -->
+            <div id="quiz-tab" class="tab-content active">
+                <div id="start-screen" class="screen active">
+                    <div class="start-icon">🎯</div>
+                    <h2>Готовий перевірити свою логіку?</h2>
+                    <p class="start-desc">Цікаві питання на логіку та уважність</p>
+                    <div class="stats-preview">
+                        <div class="stat-item">
+                            <span class="stat-number" id="total-questions">5</span>
+                            <span class="stat-label">Питань</span>
+                        </div>
+                    </div>
+                    <button class="btn-primary" id="start-btn">Почати тест</button>
+                </div>
+
+                <div id="question-screen" class="screen">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill"></div>
+                    </div>
+                    <div class="question-header">
+                        <span id="question-number">Питання 1 з 5</span>
+                        <span class="question-category" id="question-category">Логіка</span>
+                    </div>
+                    <div class="question-text" id="question-text"></div>
+                    <div class="answers" id="answers"></div>
+                    <button class="btn-next" id="next-btn">Наступне питання →</button>
+                </div>
+
+                <div id="result-screen" class="screen">
+                    <div class="result-icon" id="result-icon">🎉</div>
+                    <h2 id="result-title">Чудово!</h2>
+                    <div class="result-score" id="result-score">4 з 5</div>
+                    <p class="result-message" id="result-message"></p>
+                    <button class="btn-primary" id="restart-btn">Почати знову</button>
+                </div>
+            </div>
+
+            <!-- ЦІЛІ -->
+            <div id="diary-tab" class="tab-content">
+                <div class="sticker-form">
+                    <h3>➕ Додати нову ціль</h3>
+                    <div class="form-row">
+                        <input type="text" id="sticker-input" placeholder="Наприклад: Прочитати книгу" maxlength="100">
+                        <select id="sticker-color">
+                            <option value="#7b2fff">💜 Фіолетовий</option>
+                            <option value="#00f5ff">💙 Блакитний</option>
+                            <option value="#00ff88">💚 Зелений</option>
+                            <option value="#ff6b6b">❤️ Червоний</option>
+                            <option value="#ffaa00">🧡 Помаранчевий</option>
+                            <option value="#ff00ff">💗 Рожевий</option>
+                            <option value="#ffff00">💛 Жовтий</option>
+                        </select>
+                        <button id="add-sticker-btn" class="btn-add-sticker">Додати</button>
+                    </div>
+                </div>
+                <div class="stickers-board" id="stickers-board"></div>
+                <div class="empty-board" id="empty-board">
+                    <div class="empty-icon">📋</div>
+                    <p>Ще немає цілей</p>
+                    <p class="empty-sub">Додай свою першу мету вгорі!</p>
+                </div>
+            </div>
+
+            <!-- ЦИТАТИ -->
+            <div id="quotes-tab" class="tab-content">
+                <div class="quotes-container">
+                    <div class="quotes-icon">🔮</div>
+                    <div id="quotes-loading" class="quotes-loading">
+                        <div class="loading-spinner"></div>
+                        <p>Завантажую мудрість з інтернету...</p>
+                    </div>
+                    <div id="quotes-card" class="quotes-card hidden">
+                        <div class="quote-label">📜 Цитата дня</div>
+                        <div class="quote-text" id="quote-text"></div>
+                        <div class="quote-author" id="quote-author"></div>
+                        <div class="quote-buttons">
+                            <button id="new-quote-btn" class="btn-quote">🔮 Нова цитата</button>
+                        </div>
+                    </div>
+                    <div id="quotes-error" class="quotes-error hidden">
+                        <div class="error-icon">😵</div>
+                        <p>Ой, щось пішло не так...</p>
+                        <button id="retry-btn" class="btn-quote">🔄 Спробувати знову</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ГРА -->
+            <div id="game-tab" class="tab-content">
+                <div class="game-container">
+                    <div class="game-header">
+                        <div class="game-score">
+                            <span class="game-score-label">Рахунок:</span>
+                            <span class="game-score-value" id="game-score">0</span>
+                        </div>
+                        <div class="game-lives">
+                            <span id="game-lives">❤️❤️❤️</span>
+                        </div>
+                    </div>
+                    
+                    <div class="canvas-wrapper" id="canvas-wrapper">
+                        <canvas id="gameCanvas" width="400" height="500"></canvas>
+                        
+                        <!-- Стартовий екран -->
+                        <div class="game-overlay" id="game-start-overlay">
+                            <div class="game-overlay-icon">🧠</div>
+                            <h3>Імпульс Мізків</h3>
+                            <p>Тренажер таймінгу та реакції</p>
+                            <p class="game-hint">Натискай кнопку або Пробіл, щоб літати</p>
+                            <button class="btn-game-start" id="game-start-btn">СТАРТ</button>
+                        </div>
+                        
+                        <!-- Game Over -->
+                        <div class="game-overlay hidden" id="game-over-overlay">
+                            <div class="game-overlay-icon">😵</div>
+                            <h3>Гру закінчено!</h3>
+                            <p>Ваш рахунок: <strong id="final-score">0</strong></p>
+                            <button class="btn-game-start" id="game-restart-btn">ГРАТИ ЗНОВУ</button>
+                        </div>
+                        
+                        <!-- Перемога (не використовується, але залишаю на випадок) -->
+                        <div class="game-overlay hidden" id="game-win-overlay">
+                            <div class="game-overlay-icon">🏆</div>
+                            <h3>Перемога!</h3>
+                            <p>Рахунок: <strong id="win-score">0</strong></p>
+                            <button class="btn-game-start" id="game-win-restart-btn">ГРАТИ ЗНОВУ</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Кнопка стрибка -->
+                    <div class="game-controls">
+                        <button class="btn-jump" id="btn-jump">СТРИБОК</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Форма питань -->
+        <section class="add-question-section hidden" id="add-question-section">
+            <div class="create-card" id="create-card" onclick="openQuestionForm()">
+                <div class="create-card-glow"></div>
+                <div class="create-card-content">
+                    <span class="create-card-icon">✨</span>
+                    <div class="create-card-text">
+                        <strong>Створи своє питання</strong>
+                        <span>Додай власне логічне завдання</span>
+                    </div>
+                    <span class="create-card-arrow">›</span>
+                </div>
+            </div>
+            <div class="form-panel hidden" id="form-panel">
+                <div class="form-panel-header">
+                    <span class="form-panel-icon">📝</span>
+                    <strong>Нове питання</strong>
+                    <button class="form-close-btn" onclick="closeQuestionForm()">✕</button>
+                </div>
+                <form id="add-question-form">
+                    <div class="form-group">
+                        <label>Текст питання *</label>
+                        <input type="text" id="new-question" placeholder="Наприклад: Що важче: 1 кг заліза чи 1 кг пір'я?" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Категорія</label>
+                        <select id="new-category">
+                            <option value="Логіка">Логіка</option>
+                            <option value="Математика">Математика</option>
+                            <option value="Загадка">Загадка</option>
+                        </select>
+                    </div>
+                    <div class="form-group correct-answer-group">
+                        <label>✅ Правильна відповідь *</label>
+                        <input type="text" id="new-option1" placeholder="Введіть правильну відповідь" required>
+                    </div>
+                    <div class="form-group">
+                        <label>❌ Неправильна відповідь 1 *</label>
+                        <input type="text" id="new-option2" placeholder="Введіть неправильну відповідь" required>
+                    </div>
+                    <div class="form-group">
+                        <label>❌ Неправильна відповідь 2 (необов'язково)</label>
+                        <input type="text" id="new-option3" placeholder="Можна пропустити">
+                    </div>
+                    <div class="form-group">
+                        <label>❌ Неправильна відповідь 3 (необов'язково)</label>
+                        <input type="text" id="new-option4" placeholder="Можна пропустити">
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn-cancel" onclick="closeQuestionForm()">Скасувати</button>
+                        <button type="submit" class="btn-save">Зберегти</button>
+                    </div>
+                </form>
+            </div>
+            <div class="added-questions" id="added-questions">
+                <h4>Додані питання:</h4>
+                <div id="custom-questions-list"></div>
+            </div>
+        </section>
+    </div>
+    <script src="app.js?v=11.0"></script>
+</body>
+</html>
